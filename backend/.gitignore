@@ -1,0 +1,25 @@
+# ─── Dependencies ─────────────────────────────
+node_modules/
+
+# ─── Environment ──────────────────────────────
+.env
+.env.local
+.env.production
+
+# ─── Uploads (user media — store in cloud on prod) ───
+uploads/*
+!uploads/.gitkeep
+
+# ─── Logs ─────────────────────────────────────
+logs/
+*.log
+
+# ─── OS / Editor ──────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ─── Build / Misc ─────────────────────────────
+dist/
+coverage/
