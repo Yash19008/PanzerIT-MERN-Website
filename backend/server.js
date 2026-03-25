@@ -20,9 +20,9 @@ const { notFound } = require("./src/middleware/notFound");
 // ─── Route imports (uncomment as each module is built) ───────────────────────
 const authRoutes = require("./src/routes/authRoutes");
 const leadRoutes = require("./src/routes/leadRoutes");
-const postRoutes    = require("./src/routes/postRoutes");
-// const solutionRoutes = require("./src/routes/solutionRoutes");
-// const brandRoutes   = require("./src/routes/brandRoutes");
+const postRoutes = require("./src/routes/postRoutes");
+const solutionRoutes = require("./src/routes/solutionRoutes");
+const brandRoutes = require("./src/routes/brandRoutes");
 // const downloadRoutes = require("./src/routes/downloadRoutes");
 // const mediaRoutes   = require("./src/routes/mediaRoutes");
 // const settingRoutes = require("./src/routes/settingRoutes");
@@ -113,9 +113,9 @@ app.get("/api/health", (_req, res) => {
 // ─── API routes ───────────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/leads", leadRoutes);
-app.use("/api/posts",     postRoutes);
-// app.use("/api/solutions", solutionRoutes);
-// app.use("/api/brands",    brandRoutes);
+app.use("/api/posts", postRoutes);
+app.use("/api/solutions", solutionRoutes);
+app.use("/api/brands", brandRoutes);
 // app.use("/api/downloads", downloadRoutes);
 // app.use("/api/media",     mediaRoutes);
 // app.use("/api/settings",  settingRoutes);
