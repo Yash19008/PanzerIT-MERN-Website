@@ -19,7 +19,7 @@ const { notFound } = require("./src/middleware/notFound");
 
 // ─── Route imports (uncomment as each module is built) ───────────────────────
 const authRoutes = require("./src/routes/authRoutes");
-// const leadRoutes    = require("./src/routes/leadRoutes");
+const leadRoutes = require("./src/routes/leadRoutes");
 // const postRoutes    = require("./src/routes/postRoutes");
 // const solutionRoutes = require("./src/routes/solutionRoutes");
 // const brandRoutes   = require("./src/routes/brandRoutes");
@@ -87,7 +87,7 @@ app.use(cookieParser());
 // ─── Data sanitisation ────────────────────────────────────────────────────────
 app.use(mongoSanitize());   // strip $ and . from req.body / params / query
 app.use(xssClean());        // sanitise HTML/script injection in inputs
-app.use(hpp());             // prevent HTTP parameter pollution
+app.use(hpp({ whitelist: ["tags", "fields", "sort"] })); // prevent HTTP parameter pollution
 
 // ─── Compression ──────────────────────────────────────────────────────────────
 app.use(compression());
@@ -112,7 +112,7 @@ app.get("/api/health", (_req, res) => {
 
 // ─── API routes ───────────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
-// app.use("/api/leads",     leadRoutes);
+app.use("/api/leads", leadRoutes);
 // app.use("/api/posts",     postRoutes);
 // app.use("/api/solutions", solutionRoutes);
 // app.use("/api/brands",    brandRoutes);
