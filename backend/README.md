@@ -1,5 +1,6 @@
 # Project Structure
 
+```
 backend/
 ├── server.js
 ├── package.json
@@ -58,3 +59,4 @@ backend/
     │
     └── seeders/
         └── adminSeeder.js          # creates first admin user
+```
