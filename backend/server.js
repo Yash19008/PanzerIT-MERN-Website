@@ -16,6 +16,7 @@ const connectDB = require("./src/config/db");
 const logger = require("./src/config/logger");
 const errorHandler = require("./src/middleware/errorHandler");
 const { notFound } = require("./src/middleware/notFound");
+const { swaggerUi, specs } = require("./src/config/swagger");
 
 // ─── Route imports (uncomment as each module is built) ───────────────────────
 const authRoutes = require("./src/routes/authRoutes");
@@ -24,8 +25,8 @@ const postRoutes = require("./src/routes/postRoutes");
 const solutionRoutes = require("./src/routes/solutionRoutes");
 const brandRoutes = require("./src/routes/brandRoutes");
 const downloadRoutes = require("./src/routes/downloadRoutes");
-// const mediaRoutes   = require("./src/routes/mediaRoutes");
-// const settingRoutes = require("./src/routes/settingRoutes");
+const mediaRoutes = require("./src/routes/mediaRoutes");
+const settingRoutes = require("./src/routes/settingRoutes");
 
 // ─── Connect to MongoDB ───────────────────────────────────────────────────────
 connectDB();
@@ -87,7 +88,9 @@ app.use(cookieParser());
 // ─── Data sanitisation ────────────────────────────────────────────────────────
 app.use(mongoSanitize());   // strip $ and . from req.body / params / query
 app.use(xssClean());        // sanitise HTML/script injection in inputs
-app.use(hpp({ whitelist: ["tags", "fields", "sort"] })); // prevent HTTP parameter pollution
+app.use(hpp({               // prevent HTTP parameter pollution
+    whitelist: ["tags", "fields", "sort", "category", "status"],
+}));
 
 // ─── Compression ──────────────────────────────────────────────────────────────
 app.use(compression());
@@ -110,6 +113,66 @@ app.get("/api/health", (_req, res) => {
     res.status(200).json({ success: true, message: "Server is running." });
 });
 
+// ─── Swagger API Documentation ────────────────────────────────────────────────
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs, {
+    explorer: true,
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Panzer IT API Documentation',
+    swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        docExpansion: 'none',
+        filter: true,
+        showExtensions: true,
+        showCommonExtensions: true,
+        syntaxHighlight: {
+            activate: true,
+            theme: 'arta'
+        }
+    }
+}));
+
+// ─── Maintenance mode ─────────────────────────────────────────────────────────
+// Reads the singleton Setting doc — if enabled, blocks all public API calls
+// except: /api/health, /api/auth/login (so admin can still log in to disable it)
+app.use("/api", async (req, res, next) => {
+    try {
+        const Setting = require("./src/models/Setting");
+        const settings = await Setting.findOne({ key: "global" }).select("maintenance").lean();
+
+        if (!settings?.maintenance?.enabled) return next();
+
+        // Always allow health check and admin login through
+        const passthrough = ["/api/health", "/api/auth/login"];
+        if (passthrough.some((p) => req.path.startsWith(p.replace("/api", "")))) {
+            return next();
+        }
+
+        // Allow any authenticated admin/editor through (JWT in header or cookie)
+        const token =
+            req.cookies?.jwt ||
+            (req.headers.authorization?.startsWith("Bearer ") &&
+                req.headers.authorization.split(" ")[1]);
+
+        if (token) {
+            try {
+                const jwt = require("jsonwebtoken");
+                jwt.verify(token, process.env.JWT_SECRET);
+                return next(); // valid token — let them through
+            } catch (_) { /* invalid token falls through to maintenance response */ }
+        }
+
+        return res.status(503).json({
+            success: false,
+            maintenance: true,
+            message: settings.maintenance.message || "We'll be back soon.",
+        });
+    } catch (err) {
+        // If DB is down we can't read settings — let the request through
+        next();
+    }
+});
+
 // ─── API routes ───────────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/leads", leadRoutes);
@@ -117,8 +180,8 @@ app.use("/api/posts", postRoutes);
 app.use("/api/solutions", solutionRoutes);
 app.use("/api/brands", brandRoutes);
 app.use("/api/downloads", downloadRoutes);
-// app.use("/api/media",     mediaRoutes);
-// app.use("/api/settings",  settingRoutes);
+app.use("/api/media", mediaRoutes);
+app.use("/api/settings", settingRoutes);
 
 // ─── 404 + centralised error handler ─────────────────────────────────────────
 app.use(notFound);
