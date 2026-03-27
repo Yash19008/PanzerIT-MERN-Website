@@ -142,4 +142,4 @@ The API documentation will be available at `http://localhost:5000/api-docs`
 
 ## Support
 
-For API support or questions, contact the development team at support@panzerit.com
+For API support or questions, contact the development team at info@codespine.in

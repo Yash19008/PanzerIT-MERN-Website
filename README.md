@@ -2,6 +2,8 @@
 
 > **Make IT Secure** — Official website, admin panel & backend API for [panzerit.com](https://panzerit.com)
 
+> Developed by **CodeSpine** — full-stack implementation for PanzerIT, including frontend, admin UI, backend API, and deployment hardening.
+
 ---
 
 ## Project Structure
@@ -308,4 +310,4 @@ The public frontend uses the following for SEO:
 
 ## License
 
-Private project — © 2026 Panzer IT. All rights reserved.
+Developed By CodeSpine — © 2026 Panzer IT. All rights reserved.

@@ -1197,6 +1197,7 @@ describe("Auth", () => {
 ## License
 
 Proprietary — Panzer IT (2026)
+Developed By CodeSpine
 
 ---
 
