@@ -3845,6 +3845,9 @@ const options = {
   }
 };
 
+// Backward compatibility for older swagger-jsdoc versions that require `swaggerDefinition`.
+options.swaggerDefinition = options.definition;
+
 const specs = swaggerJSDoc(options);
 
 module.exports = { swaggerUi, specs };

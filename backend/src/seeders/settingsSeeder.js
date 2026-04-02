@@ -48,7 +48,7 @@ const seed = async () => {
             },
 
             seo: {
-                metaTitle: "Panzer IT — Make IT Secure | Best IT Security Solution Provider in India",
+                metaTitle: "Panzer IT | Best IT Security Solutions Provider in India",
                 metaDescription: "Panzer IT provides 360° IT security solutions — Endpoint Security, DLP, Backup & DR, VAPT, IAM, PAM and more across India.",
                 twitterCard: "summary_large_image",
                 organization: {
