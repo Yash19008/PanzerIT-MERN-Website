@@ -69,7 +69,7 @@ app.use(
 
 // ─── Global rate limiter (all routes) ─────────────────────────────────────────
 const globalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 10 * 60 * 1000, // 10 minutes
     max: 200,                  // requests per window per IP
     standardHeaders: true,
     legacyHeaders: false,
