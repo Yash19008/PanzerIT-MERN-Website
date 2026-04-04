@@ -2,7 +2,6 @@
 #  PanzerIT — Monorepo .gitignore
 # ─────────────────────────────────────────
 
-
 # ── Dependencies ──────────────────────────
 node_modules/
 .pnp
@@ -73,9 +72,11 @@ backend/dist/
 
 
 # ── Misc ──────────────────────────────────
+.vscode
 *.tgz
 *.zip
 .cache/
 .parcel-cache/
 .turbo/
 Proposal/
+.vscode
