@@ -9,7 +9,7 @@ const logger = require("../config/logger");
 // ─── Allowed MIME types ───────────────────────────────────────────────────────
 const ALLOWED_IMAGE_TYPES = (
     process.env.ALLOWED_IMAGE_TYPES ||
-    "image/jpeg,image/png,image/webp,image/svg+xml"
+    "image/gif,image/jpeg,image/png,image/webp,image/svg+xml"
 ).split(",");
 
 const ALLOWED_DOC_TYPES = (
