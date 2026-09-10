@@ -60,11 +60,11 @@ function SkillItemRow({
   useEffect(() => {
     if (!animate) return;
 
-    let start = 0;
-    const duration = 2500;
-    const steps = 50;
+    let start = 40;
+    const duration = 600;
+    const steps = 30;
     const stepTime = duration / steps;
-    const increment = targetPercentage / steps;
+    const increment = (targetPercentage - start) / steps;
 
     const timer = setInterval(() => {
       start += increment;
@@ -89,8 +89,8 @@ function SkillItemRow({
           <div
             className="bar progress-line"
             style={{
-              width: animate ? `${targetPercentage}%` : "0%",
-              transition: "width 2.5s cubic-bezier(0.1, 0.4, 0.2, 1)",
+              width: animate ? `${targetPercentage}%` : "40%",
+              transition: animate ? "width 0.6s cubic-bezier(0.2, 0.8, 0.4, 1)" : "none",
             }}
           >
             <div className="skill-percentage">

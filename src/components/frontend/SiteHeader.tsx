@@ -95,18 +95,7 @@ function MainNavigation({
           {activeSolutions.map((item: any) => (
             <li key={item.label}>
               <Link href={item.href || "/solution"} onClick={onNavigate}>
-                {item.logo ? (
-                  <Image
-                    src={item.logo}
-                    alt={item.logoAlt || item.label}
-                    width={28}
-                    height={28}
-                    className="panzer-dropdown-icon"
-                    style={{ width: '28px', height: '28px', objectFit: 'contain' }}
-                  />
-                ) : (
-                  <i className={`fa-solid ${item.icon || "fa-shield-check"} panzer-dropdown-icon`}></i>
-                )}
+                <i className={`fa-solid ${item.icon || "fa-shield-check"} panzer-dropdown-icon`}></i>
                 <span>{item.label}</span>
               </Link>
             </li>
@@ -125,18 +114,7 @@ function MainNavigation({
           {activeBrands.map((item: any) => (
             <li key={item.id || item.label}>
               <Link href={item.href || "/brand"} onClick={onNavigate}>
-                {item.logo ? (
-                  <Image
-                    src={item.logo}
-                    alt={item.label}
-                    width={28}
-                    height={28}
-                    className="panzer-dropdown-icon"
-                    style={{ width: '28px', height: '28px', objectFit: 'contain' }}
-                  />
-                ) : (
-                  <i className="fa-solid fa-shield-check panzer-dropdown-icon"></i>
-                )}
+                <i className="fa-solid fa-shield-check panzer-dropdown-icon"></i>
                 <span>{item.label}</span>
               </Link>
             </li>

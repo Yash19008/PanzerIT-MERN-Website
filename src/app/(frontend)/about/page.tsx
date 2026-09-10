@@ -231,7 +231,7 @@ export default function Page() {
             */}
 
             {/* Why Organizations Trust Panzer IT Section */}
-            <section className="panzer-why-trust-section space position-relative" style={{ background: 'var(--bs-bg-color24)', padding: '90px 0' }}>
+            <section className="panzer-why-trust-section space position-relative" style={{ background: 'var(--bs-bg-color24)', padding: '60px 0' }}>
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-12">
@@ -322,13 +322,13 @@ export default function Page() {
                                 <div className="title-wrap three">
                                     <div className="sub-title-2 text-theme">Mission Statement</div>
                                     <h2 className="sec-title no-title-animation">Continuous Data Security,<br /> Accessibility & Availability</h2>
-                                    <p>We believe the purpose of Information Technology is to make business data secure, accessible and available whenever required. Every solution we recommend is designed around this principle.</p>
+                                    <p>Panzer IT helps organizations secure, govern and recover critical business data through integrated cybersecurity, identity security, UBA, data protection and disaster recovery solutions. Our mission is to make enterprise-grade security accessible, practical and effective for organizations of all sizes.</p>
                                 </div>
 
                                 <SkillBars
                                     skills={[
-                                        { title: "Secure Infrastructure", percentage: 95 },
-                                        { title: "Data Availability and Disaster Recovery", percentage: 92 }
+                                        { title: "Secure Infrastructure", percentage: 100 },
+                                        { title: "Data Availability and Disaster Recovery", percentage: 100 }
                                     ]}
                                 />
                                 <Link href="/solution" className="theme-btn mt-40 br-30 panzer-static-about-btn">
@@ -354,7 +354,7 @@ export default function Page() {
             </section>
 
             {/* Industries We Serve Section */}
-            <section className="panzer-industries-section space position-relative" style={{ background: 'var(--bs-bg-color24)', padding: '90px 0' }}>
+            <section className="panzer-industries-section space position-relative" style={{ background: 'var(--bs-bg-color24)', padding: '60px 0' }}>
                 <style>{`
                     .panzer-industries-grid {
                         display: grid;

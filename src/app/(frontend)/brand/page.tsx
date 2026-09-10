@@ -2,7 +2,7 @@ import { Breadcrumb } from "@/components/frontend/Breadcrumb";
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from 'next';
-import { getSeoData } from '@/app/admin/settings/seo/seoStore';
+import { getSeoData, getBreadcrumbData } from '@/app/admin/settings/seo/seoStore';
 import { readActiveFrontendBrands } from "@/app/admin/brands/brandStore";
 import { BrandGridClient } from "@/components/frontend/BrandGridClient";
 import { createPageMetadata } from '@/utils/metadata';
@@ -29,14 +29,19 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const activeBrands = await readActiveFrontendBrands();
+  const [activeBrands, bc] = await Promise.all([
+    readActiveFrontendBrands(),
+    getBreadcrumbData('breadcrumb_brand_list'),
+  ]);
 
   return (
     <>
       <Breadcrumb
-        title="Brands"
+        title={bc.title || "Brands"}
         paths={[{ name: "Brands" }]}
-        description="Explore Panzer IT resources, solutions and security insights designed to help your business stay informed and protected."
+        description={bc.description || "Explore Panzer IT resources, solutions and security insights designed to help your business stay informed and protected."}
+        image={bc.image || undefined}
+        imageAlt={bc.imageAlt || undefined}
       />
 
       <section className="tv-service-section space-bottom inner style-2 bg-light pt-100 panzer-brand-page">

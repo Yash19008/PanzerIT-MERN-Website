@@ -240,6 +240,12 @@ const MENU_ITEMS_DATA: MenuItemType[] = [
         parentKey: 'settings',
       },
       {
+        key: 'settings-breadcrumbs',
+        label: 'Breadcrumbs',
+        url: '/admin/settings/breadcrumbs',
+        parentKey: 'settings',
+      },
+      {
         key: 'settings-custom-code',
         label: 'Custom Code',
         url: '/admin/settings/custom-code',

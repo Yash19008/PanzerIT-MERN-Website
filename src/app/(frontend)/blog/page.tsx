@@ -1,7 +1,7 @@
 import { Breadcrumb } from "@/components/frontend/Breadcrumb";
 import Link from "next/link";
 import { Metadata } from 'next';
-import { getSeoData } from '@/app/admin/settings/seo/seoStore';
+import { getSeoData, getBreadcrumbData } from '@/app/admin/settings/seo/seoStore';
 import { readActiveFrontendPosts, readCategories } from "@/app/admin/posts/blogStore";
 import { BlogGridClient } from "@/components/frontend/BlogGridClient";
 import { createPageMetadata } from '@/utils/metadata';
@@ -40,7 +40,11 @@ export default async function Page({ searchParams }: PageProps) {
   const categoryFilter = resolvedParams.category as string | undefined;
   const tagFilter = resolvedParams.tag as string | undefined;
 
-  const [published, categories] = await Promise.all([readActiveFrontendPosts(), readCategories()]);
+  const [published, categories, bc] = await Promise.all([
+    readActiveFrontendPosts(),
+    readCategories(),
+    getBreadcrumbData('breadcrumb_blog_list'),
+  ]);
   
   let filteredPosts = published;
   if (categoryFilter) {
@@ -56,9 +60,11 @@ export default async function Page({ searchParams }: PageProps) {
   return (
     <>
       <Breadcrumb
-        title="Blogs"
+        title={bc.title || "Blogs"}
         paths={[{ name: "Blogs" }]}
-        description="Explore Panzer IT resources, solutions and security insights designed to help your business stay informed and protected."
+        description={bc.description || "Explore Panzer IT resources, solutions and security insights designed to help your business stay informed and protected."}
+        image={bc.image || undefined}
+        imageAlt={bc.imageAlt || undefined}
       />
 
       <section className="tv-blog-section space bg-light">

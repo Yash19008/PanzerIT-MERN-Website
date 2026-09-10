@@ -80,3 +80,74 @@ export const uploadSeoImage = async (
     return { success: false, error: err.message }
   }
 }
+
+// ─── Page Breadcrumb Settings ────────────────────────────────────────────────
+// Stored in site_settings:
+//   breadcrumb_solution_list | breadcrumb_brand_list | breadcrumb_blog_list
+
+export type PageBreadcrumbData = {
+  title: string
+  description: string
+  image: string
+  imageAlt: string
+}
+
+const DEFAULT_BREADCRUMB: PageBreadcrumbData = {
+  title: '',
+  description: '',
+  image: '',
+  imageAlt: '',
+}
+
+export const getBreadcrumbData = async (pageKey: string): Promise<PageBreadcrumbData> => {
+  return await readSetting<PageBreadcrumbData>(pageKey, DEFAULT_BREADCRUMB)
+}
+
+export const updateBreadcrumbData = async (
+  pageKey: string,
+  data: PageBreadcrumbData
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    await checkAuth()
+    if (data.image) {
+      data.image = stripBase64(data.image)
+    }
+    await writeSetting(pageKey, data)
+    revalidatePath('/', 'layout')
+    return { success: true }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
+}
+
+const BC_UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'breadcrumbs')
+const BC_UPLOAD_URL_BASE = '/uploads/breadcrumbs'
+
+export const uploadBreadcrumbImage = async (
+  formData: FormData
+): Promise<{ success: boolean; url?: string; error?: string }> => {
+  try {
+    await checkAuth()
+    const file = formData.get('image') as File | null
+    if (!file || file.size === 0) return { success: false, error: 'No file provided' }
+
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/svg+xml']
+    if (!allowedTypes.includes(file.type)) {
+      return { success: false, error: 'Invalid file type. Use PNG, JPG, WEBP, GIF or SVG.' }
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      return { success: false, error: 'File too large. Maximum 5 MB.' }
+    }
+    await mkdir(BC_UPLOAD_DIR, { recursive: true })
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'png'
+    const filename = `breadcrumb-${Date.now()}.${ext}`
+    const filepath = path.join(BC_UPLOAD_DIR, filename)
+    const buffer = Buffer.from(await file.arrayBuffer())
+    await writeFile(filepath, buffer)
+
+    const url = `${BC_UPLOAD_URL_BASE}/${filename}`
+    return { success: true, url }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
+}
