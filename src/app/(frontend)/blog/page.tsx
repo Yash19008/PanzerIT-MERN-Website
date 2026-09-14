@@ -56,6 +56,7 @@ export default async function Page({ searchParams }: PageProps) {
   }
 
   const categoryById = new Map(categories.map((c) => [c.id, c.name]));
+  const categorySlugById = new Map(categories.map((c) => [c.id, c.slug || c.id]));
 
   return (
     <>
@@ -73,6 +74,7 @@ export default async function Page({ searchParams }: PageProps) {
             posts={filteredPosts as any} 
             fallbackImages={fallbackImages} 
             categoryMap={Object.fromEntries(categoryById)} 
+            categorySlugMap={Object.fromEntries(categorySlugById)}
           />
         </div>
       </section>

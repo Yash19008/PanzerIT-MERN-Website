@@ -19,6 +19,7 @@ type BlogGridClientProps = {
   posts: Post[];
   fallbackImages: string[];
   categoryMap: Record<string, string>;
+  categorySlugMap?: Record<string, string>;
 };
 
 const formatDate = (value?: string | null) => {
@@ -30,7 +31,7 @@ const formatDate = (value?: string | null) => {
   }).format(new Date(value));
 };
 
-export function BlogGridClient({ posts, fallbackImages, categoryMap }: BlogGridClientProps) {
+export function BlogGridClient({ posts, fallbackImages, categoryMap, categorySlugMap }: BlogGridClientProps) {
   const [visibleCount, setVisibleCount] = useState(9);
 
   const paginatedPosts = posts.slice(0, visibleCount);
@@ -54,6 +55,7 @@ export function BlogGridClient({ posts, fallbackImages, categoryMap }: BlogGridC
         {paginatedPosts.map((post, index) => {
           const imgSrc = post.image || fallbackImages[index % fallbackImages.length];
           const categoryName = post.categoryId ? (categoryMap[post.categoryId] || "") : "";
+          const categorySlug = post.categorySlug || (post.categoryId ? (categorySlugMap?.[post.categoryId] || post.categoryId) : "");
           const dateStr = formatDate(post.publishedAt || post.createdAt);
 
           return (
@@ -80,7 +82,13 @@ export function BlogGridClient({ posts, fallbackImages, categoryMap }: BlogGridC
                     />
                     <div className="category-tag">
                       <span></span>
-                      {categoryName || dateStr}
+                      {categoryName ? (
+                        <Link href={`/blog/category/${categorySlug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                          {categoryName}
+                        </Link>
+                      ) : (
+                        dateStr
+                      )}
                     </div>
                   </div>
                   <div className="blog-content d-flex flex-column flex-grow-1">

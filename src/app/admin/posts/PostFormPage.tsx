@@ -589,7 +589,7 @@ const PostFormPage = ({ mode, postId }: Props) => {
               </div>
 
               <div className={styles.field}>
-                <span>Breadcrumb Banner Image</span>
+                <span>Breadcrumb Banner Image <small style={{ color: '#64748b', fontWeight: 'normal', fontSize: '12px' }}>(Recommended: 1920 × 620 px)</small></span>
                 <div className={styles.imageUpload}>
                   {form.breadcrumbImage ? (
                     <div className={styles.imagePreview}>
@@ -602,7 +602,7 @@ const PostFormPage = ({ mode, postId }: Props) => {
                     <button type="button" className={styles.uploadPlaceholder} onClick={() => setShowBreadcrumbImagePicker(true)}>
                       <IconifyIcon icon="tabler:photo-plus" />
                       <strong>Upload or select breadcrumb image</strong>
-                      <small>PNG, JPG, WEBP, or GIF</small>
+                      <small>PNG, JPG, WEBP, or GIF (1920 × 620 px)</small>
                     </button>
                   )}
                   {form.breadcrumbImage && (

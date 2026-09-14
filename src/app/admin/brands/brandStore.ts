@@ -32,6 +32,20 @@ export type {
 
 // ─── Brands ──────────────────────────────────────────────────────────────────
 
+let brandMenuIconEnsured = false
+async function ensureBrandMenuIconColumn() {
+  if (brandMenuIconEnsured) return
+  try {
+    const [cols] = await pool.query<any[]>("SHOW COLUMNS FROM brands LIKE 'menu_icon'")
+    if (cols.length === 0) {
+      await pool.query("ALTER TABLE brands ADD COLUMN menu_icon VARCHAR(500) NULL AFTER logo_alt")
+    }
+    brandMenuIconEnsured = true
+  } catch (e) {
+    console.error('Error ensuring menu_icon column on brands:', e)
+  }
+}
+
 // Legacy function for backward compatibility
 export const readBrands = async (): Promise<BrandPartner[]> => {
   const result = await readBrandsPaginated(1, 1000)
@@ -40,6 +54,7 @@ export const readBrands = async (): Promise<BrandPartner[]> => {
 
 // New paginated function
 export const readBrandsPaginated = async (page: number = 1, limit: number = 10): Promise<{ brands: BrandPartner[], total: number }> => {
+  await ensureBrandMenuIconColumn()
   const offset = (page - 1) * limit
   
   // Get total count
@@ -66,6 +81,7 @@ export const readBrandsPaginated = async (page: number = 1, limit: number = 10):
     imageAlt: row.image_alt ?? '',
     logo: row.logo ?? '',
     logoAlt: row.logo_alt ?? '',
+    menuIcon: row.menu_icon ?? '',
     order: row.sort_order ?? 1,
     featured: Boolean(row.featured),
     status: row.status,
@@ -106,6 +122,7 @@ export const readBrandsPaginated = async (page: number = 1, limit: number = 10):
 }
 
 export const findBrandBySlug = async (slug: string): Promise<BrandPartner | undefined> => {
+  await ensureBrandMenuIconColumn()
   const [rows] = await pool.query('SELECT * FROM brands WHERE slug = ? AND status = ? LIMIT 1', [slug, 'active'])
   const row = (rows as any[])[0]
   if (!row) return undefined
@@ -124,6 +141,7 @@ export const findBrandBySlug = async (slug: string): Promise<BrandPartner | unde
     imageAlt: row.image_alt ?? '',
     logo: row.logo ?? '',
     logoAlt: row.logo_alt ?? '',
+    menuIcon: row.menu_icon ?? '',
     order: row.sort_order ?? 1,
     featured: Boolean(row.featured),
     status: row.status,
@@ -173,6 +191,7 @@ export const readRandomBrands = async (excludeSlug: string, limit: number = 10):
 }
 
 export const findBrand = async (id: string): Promise<BrandPartner | undefined> => {
+  await ensureBrandMenuIconColumn()
   const [rows] = await pool.query('SELECT * FROM brands WHERE id = ?', [id])
   const row = (rows as any[])[0]
   if (!row) return undefined
@@ -191,6 +210,7 @@ export const findBrand = async (id: string): Promise<BrandPartner | undefined> =
     imageAlt: row.image_alt ?? '',
     logo: row.logo ?? '',
     logoAlt: row.logo_alt ?? '',
+    menuIcon: row.menu_icon ?? '',
     order: row.sort_order ?? 1,
     featured: Boolean(row.featured),
     status: row.status,
@@ -219,11 +239,12 @@ export const findBrand = async (id: string): Promise<BrandPartner | undefined> =
     description: ec.description || '',
   }))
 
-  return brand
+  return sanitizeDeep(brand)
 }
 
 export const createBrand = async (data: BrandFormData): Promise<BrandPartner | { success: false, message: string }> => {
   await checkAuth()
+  await ensureBrandMenuIconColumn()
   const id = `b${Date.now()}`
   const createdAt = new Date().toISOString().slice(0, 19).replace('T', ' ')
   const finalSlug = data.slug || data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
@@ -236,11 +257,11 @@ export const createBrand = async (data: BrandFormData): Promise<BrandPartner | {
   await pool.query(
     `INSERT INTO brands (
       id, name, slug, website, category, description, image, image_title, image_caption, image_description, image_alt,
-      logo, logo_alt, sort_order, featured, status, meta_title,
+      logo, logo_alt, menu_icon, sort_order, featured, status, meta_title,
       meta_description, meta_keywords, capabilities_title, capabilities_heading, capabilities_points, breadcrumb_description,
       breadcrumb_image, breadcrumb_image_alt, breadcrumb_image_title, breadcrumb_image_caption, breadcrumb_image_description,
       homepage_tagline, homepage_sub_tagline, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       data.name,
@@ -255,6 +276,7 @@ export const createBrand = async (data: BrandFormData): Promise<BrandPartner | {
       data.imageAlt || '',
       data.logo ? stripBase64(data.logo) : '',
       data.logoAlt || '',
+      data.menuIcon ? stripBase64(data.menuIcon) : '',
       data.order || 1,
       data.featured ? 1 : 0,
       data.status || 'active',
@@ -318,6 +340,7 @@ export const updateBrand = async (id: string, data: Partial<BrandFormData>): Pro
     imageAlt: 'image_alt',
     logo: 'logo',
     logoAlt: 'logo_alt',
+    menuIcon: 'menu_icon',
     order: 'sort_order',
     featured: 'featured',
     status: 'status',
@@ -342,7 +365,7 @@ export const updateBrand = async (id: string, data: Partial<BrandFormData>): Pro
       updates.push(`${dbField} = ?`)
       let val = (data as any)[key]
       if (key === 'featured') val = val ? 1 : 0
-      if ((key === 'image' || key === 'logo') && typeof val === 'string') val = stripBase64(val)
+      if ((key === 'image' || key === 'logo' || key === 'breadcrumbImage') && typeof val === 'string') val = stripBase64(val)
       values.push(val)
     }
   }

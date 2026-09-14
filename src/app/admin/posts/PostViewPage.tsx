@@ -57,12 +57,12 @@ const PostViewPage = ({ postId }: Props) => {
             <h3>Blog Post Details</h3>
           </div>
           <div className={styles.headerActions}>
-            <Link href="/posts" className={styles.backBtn}>
+            <Link href="/admin/posts" className={styles.backBtn}>
               <IconifyIcon icon="tabler:arrow-left" />
               Back to Posts
             </Link>
             {post && (
-              <Link href={`/posts/${post.id}/edit`} className={styles.editBtn}>
+              <Link href={`/admin/posts/${post.id}/edit`} className={styles.editBtn}>
                 <IconifyIcon icon="tabler:pencil" />
                 Edit Post
               </Link>

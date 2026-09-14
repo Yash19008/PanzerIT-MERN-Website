@@ -19,7 +19,10 @@ import "./globals.css";
 
 import { SiteFooter } from "@/components/frontend/SiteFooter";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://panzerit.codespine.in';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Panzer IT | Make 'IT' Secure",
   description: "Panzer IT — Professional IT Services",
   icons: {
@@ -38,10 +41,15 @@ export default async function FrontendLayout({
   children: React.ReactNode;
 }>) {
   // Optimized: Single cached query instead of loading full datasets
-  const headerData = await getHeaderData();
+  const [headerData, themeColorsSetting, customCode, dynamicFavicon] = await Promise.all([
+    getHeaderData(),
+    readSetting<Record<string, string>>('frontend_theme_colors', {}),
+    getCustomCode(),
+    readSetting<string>('frontend_favicon', ''),
+  ]);
 
-  let themeColors = await readSetting<Record<string, string>>('frontend_theme_colors', {});
-  const customCode = await getCustomCode();
+  let themeColors = themeColorsSetting;
+  const faviconUrl = dynamicFavicon || '/assets/images/favicons/favicon.jpeg';
   
   // Theme Preview Override via Cookies
   const cookieStore = await cookies();
@@ -91,6 +99,11 @@ export default async function FrontendLayout({
           ${cssVariables || ''}
         }
       `}} />
+      {/* Dynamic Favicon */}
+      <link rel="icon" href={faviconUrl} sizes="any" />
+      <link rel="shortcut icon" href={faviconUrl} />
+      <link rel="apple-touch-icon" href={faviconUrl} />
+
       {/* Resource Hints - Improve connection speed */}
       <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
       <link rel="dns-prefetch" href="https://fonts.gstatic.com" />

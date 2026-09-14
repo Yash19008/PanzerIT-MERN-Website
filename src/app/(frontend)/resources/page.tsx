@@ -6,7 +6,7 @@ import Link from "next/link";
 import ServiceContactForm from "@/components/frontend/ServiceContactForm";
 import ResourcesFilterClient from "../../../components/frontend/ResourcesFilterClient";
 import { SolutionDetailSticky } from "@/components/frontend/SolutionDetailSticky";
-import { readActiveFrontendResources, readResourceCategories } from "@/app/admin/resources/resourceStore";
+import { readActiveFrontendResources, readResourceCategories, getResourceDirectorySettings } from "@/app/admin/resources/resourceStore";
 import { readActiveQuestionnaires } from "@/app/admin/resources/questionnaires/questionnaireStore";
 import { createPageMetadata } from '@/utils/metadata';
 
@@ -19,10 +19,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-    // Fetch resources and categories dynamically from database
-    const dbResources = await readActiveFrontendResources();
-    const dbCategories = await readResourceCategories();
-    const questionnaires = await readActiveQuestionnaires();
+    // Fetch resources, categories, questionnaires, and directory settings dynamically from database
+    const [dbResources, dbCategories, questionnaires, directorySettings] = await Promise.all([
+      readActiveFrontendResources(),
+      readResourceCategories(),
+      readActiveQuestionnaires(),
+      getResourceDirectorySettings()
+    ]);
     
     // Map to frontend expected format
     const resources = dbResources.map(r => ({
@@ -58,7 +61,7 @@ export default async function Page() {
                         </div>
                     </div>
                     {/* Client-side filter with dynamic data */}
-                    <ResourcesFilterClient items={resources} categories={dbCategories} questionnaires={questionnaires} />
+                    <ResourcesFilterClient items={resources} categories={dbCategories} questionnaires={questionnaires} directorySettings={directorySettings} />
                 </div>
             </section>
         </>

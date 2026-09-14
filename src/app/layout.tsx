@@ -9,7 +9,9 @@ const barlow = Barlow({
   variable: '--font-barlow',
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.panzerit.com';
+import { getSiteUrl } from "@/utils/metadata";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

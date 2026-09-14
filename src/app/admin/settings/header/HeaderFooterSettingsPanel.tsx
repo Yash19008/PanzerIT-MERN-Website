@@ -190,16 +190,155 @@ const LogoUploadSection = ({ logoUrl, logoAlt, logoWidth, onUpload, onAltChange,
   )
 }
 
+// ── Favicon Upload Block ───────────────────────────────────────────────────
+
+interface FaviconUploadSectionProps {
+  faviconUrl: string
+  onUpload: (url: string) => void
+  onRemove: () => void
+}
+
+const FaviconUploadSection = ({ faviconUrl, onUpload, onRemove }: FaviconUploadSectionProps) => {
+  const [isDragOver, setIsDragOver] = useState(false)
+  const [showPicker, setShowPicker] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const processFile = (file: File) => {
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type) && !file.name.endsWith('.ico')) {
+      toast.error('Please upload a valid icon file (.ico, .png, .svg, .jpg, .webp)')
+      return
+    }
+    if (file.size > 1024 * 1024) {
+      toast.error('Favicon must be under 1 MB')
+      return
+    }
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('folder', 'favicons')
+
+    const upload = async () => {
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
+        const data = await res.json()
+        if (res.ok && data.url) {
+          onUpload(data.url)
+          toast.success('Favicon uploaded successfully')
+        } else {
+          toast.error(data.error || 'Favicon upload failed')
+        }
+      } catch {
+        toast.error('Favicon upload failed')
+      }
+    }
+    upload()
+  }
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) processFile(e.target.files[0])
+    e.target.value = ''
+  }
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setIsDragOver(false)
+    if (e.dataTransfer.files?.[0]) processFile(e.dataTransfer.files[0])
+  }
+
+  const handleRemove = () => {
+    onRemove()
+    toast.info('Favicon removed (default will be used)')
+  }
+
+  return (
+    <div className={styles.fieldStack}>
+      <div
+        className={clsx(styles.logoDropZone, isDragOver && styles.logoDropZoneActive)}
+        onDrop={handleDrop}
+        onDragOver={(e) => { e.preventDefault(); setIsDragOver(true) }}
+        onDragLeave={() => setIsDragOver(false)}
+        onClick={() => setShowPicker(true)}
+        role="button"
+        tabIndex={0}
+        aria-label="Upload favicon"
+        onKeyDown={(e) => e.key === 'Enter' && setShowPicker(true)}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/x-icon,image/png,image/jpeg,image/jpg,image/svg+xml,image/webp,.ico"
+          className={styles.hiddenInput}
+          onChange={handleInput}
+          aria-hidden="true"
+        />
+        {faviconUrl ? (
+          <div className={styles.logoPreviewWrap}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={faviconUrl}
+              alt="Website Favicon"
+              className={styles.logoPreviewImg}
+              style={{
+                width: '48px',
+                height: '48px',
+                objectFit: 'contain',
+                padding: '4px',
+                borderRadius: '8px',
+                border: '1px solid #e2e8f0',
+                background: '#f8fafc',
+              }}
+            />
+            <span className={styles.logoChangeHint}>
+              <IconifyIcon icon="tabler:refresh" />
+              Click or drag to replace
+            </span>
+          </div>
+        ) : (
+          <>
+            <span className={styles.logoDropIcon}>
+              <IconifyIcon icon={isDragOver ? 'tabler:photo-down' : 'tabler:world-upload'} />
+            </span>
+            <strong>{isDragOver ? 'Drop to upload' : 'Upload or select website favicon'}</strong>
+            <span>Click to browse &mdash; ICO, PNG, SVG &middot; recommended 32x32 or 64x64 px</span>
+          </>
+        )}
+      </div>
+
+      {faviconUrl && (
+        <button type="button" className={styles.removeLogoBtn} onClick={handleRemove}>
+          <IconifyIcon icon="tabler:trash" />
+          Remove favicon
+        </button>
+      )}
+
+      {showPicker && (
+        <MediaPickerModal
+          show={showPicker}
+          onClose={() => setShowPicker(false)}
+          onSelect={onUpload}
+        />
+      )}
+    </div>
+  )
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 
 const HeaderFooterSettingsPanel = () => {
   const [headerLogo, setHeaderLogo] = useState<HeaderLogoState>(defaultHeaderLogo)
+  const [faviconUrl, setFaviconUrl] = useState<string>('')
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     const init = async () => {
-      const dbHeader = await readSetting('PANZER_HEADER_SETTINGS', defaultHeaderLogo)
+      const [dbHeader, dbFavicon] = await Promise.all([
+        readSetting('PANZER_HEADER_SETTINGS', defaultHeaderLogo),
+        readSetting<string>('frontend_favicon', ''),
+      ])
       setHeaderLogo({ ...defaultHeaderLogo, ...dbHeader })
+      setFaviconUrl(dbFavicon || '')
     }
     init()
   }, [])
@@ -207,10 +346,13 @@ const HeaderFooterSettingsPanel = () => {
   const handleSave = async () => {
     try {
       setSaving(true)
-      await writeSetting('PANZER_HEADER_SETTINGS', headerLogo)
-      toast.success('Header settings saved successfully')
+      await Promise.all([
+        writeSetting('PANZER_HEADER_SETTINGS', headerLogo),
+        writeSetting('frontend_favicon', faviconUrl),
+      ])
+      toast.success('Header & favicon settings saved successfully')
     } catch (err: any) {
-      toast.error(err?.message || 'Failed to save header settings')
+      toast.error(err?.message || 'Failed to save settings')
     } finally {
       setSaving(false)
     }
@@ -218,6 +360,7 @@ const HeaderFooterSettingsPanel = () => {
   
   const handleReset = () => {
     setHeaderLogo(defaultHeaderLogo)
+    setFaviconUrl('')
     toast.info('Settings reset to defaults')
   }
 
@@ -226,8 +369,8 @@ const HeaderFooterSettingsPanel = () => {
       {/* ── Page Header ── */}
       <div className={styles.pageHeader}>
         <div>
-          <h2>Header Settings</h2>
-          <p>Manage your website&apos;s header appearance</p>
+          <h2>Header & Favicon Settings</h2>
+          <p>Manage your website&apos;s header logo and browser favicon</p>
         </div>
         <div className={styles.actions}>
           <button type="button" onClick={handleReset} disabled={saving}>
@@ -257,6 +400,19 @@ const HeaderFooterSettingsPanel = () => {
               onAltChange={(alt) => setHeaderLogo((prev) => ({ ...prev, logoAlt: alt }))}
               onWidthChange={(w) => setHeaderLogo((prev) => ({ ...prev, logoWidth: w }))}
               onRemove={() => setHeaderLogo((prev) => ({ ...prev, logoUrl: '' }))}
+            />
+          </section>
+
+          <section className={styles.panel}>
+            <SectionTitle
+              icon="tabler:world-share"
+              title="Website Favicon"
+              subtitle="Upload the browser tab icon (.ico, .png, .svg - recommended size: 32x32 or 64x64 px)"
+            />
+            <FaviconUploadSection
+              faviconUrl={faviconUrl}
+              onUpload={(url) => setFaviconUrl(url)}
+              onRemove={() => setFaviconUrl('')}
             />
           </section>
         </div>

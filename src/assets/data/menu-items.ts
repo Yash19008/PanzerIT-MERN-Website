@@ -171,6 +171,12 @@ const MENU_ITEMS_DATA: MenuItemType[] = [
         url: '/admin/resources/categories',
         parentKey: 'resources',
       },
+      {
+        key: 'resource-questionnaires',
+        label: 'Questionnaires',
+        url: '/admin/resources/questionnaires',
+        parentKey: 'resources',
+      },
     ],
   },
   {

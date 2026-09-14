@@ -83,9 +83,21 @@ export default function Page() {
                         </div>
                     </div>
                     <div className="panzer-about-secure-bottom">
-                        <Link href="/contact" className="panzer-about-secure-cta">
-                            <span>Let&apos;s Make IT Secure</span>
-                            <i className="fa-solid fa-arrow-right"></i>
+                        <Link href="/contact" className="theme-btn br-30 panzer-about-secure-cta">
+                            <span className="link-effect">
+                                <span className="effect-1">Let&apos;s Make IT Secure</span>
+                                <span className="effect-1">Let&apos;s Make IT Secure</span>
+                            </span>
+                            <span className="arrow-all">
+                                <i>
+                                    <svg width="16" height="19" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 6H10M10 6L6 2M10 6L6 10" stroke="var(--theme-color)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                    <svg width="16" height="19" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 6H10M10 6L6 2M10 6L6 10" stroke="var(--theme-color)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </i>
+                            </span>
                         </Link>
                         <div className="panzer-about-secure-stats" aria-label="Panzer IT highlights">
                             <div className="panzer-about-secure-stat">
@@ -331,7 +343,7 @@ export default function Page() {
                                         { title: "Data Availability and Disaster Recovery", percentage: 100 }
                                     ]}
                                 />
-                                <Link href="/solution" className="theme-btn mt-40 br-30 panzer-static-about-btn">
+                                <Link href="/solution" className="theme-btn mt-40 br-30">
                                     <span className="link-effect">
                                         <span className="effect-1">Solution</span>
                                         <span className="effect-1">Solution</span>

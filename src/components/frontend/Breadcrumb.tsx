@@ -59,8 +59,39 @@ export function Breadcrumb({
     </nav>
   );
 
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://panzerit.codespine.in').replace(/\/+$/, '');
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": `${siteUrl}/`
+      },
+      ...paths.map((p, index) => {
+        const itemObj: { "@type": string; position: number; name: string; item?: string } = {
+          "@type": "ListItem",
+          "position": index + 2,
+          "name": p.name
+        };
+        if (p.url) {
+          itemObj.item = p.url.startsWith('http') ? p.url : `${siteUrl}${p.url.startsWith('/') ? '' : '/'}${p.url}`;
+        }
+        return itemObj;
+      })
+    ]
+  };
+
   return (
-    <section className="panzer-resource-breadcrumb-section" aria-label={`${title} breadcrumb`}>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <section className="panzer-resource-breadcrumb-section" aria-label={`${title} breadcrumb`}>
       <div className="container-fluid">
         <div className="container">
           {navContent}
@@ -132,5 +163,6 @@ export function Breadcrumb({
         )}
       </div>
     </section>
+    </>
   );
 }

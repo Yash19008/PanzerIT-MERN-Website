@@ -46,6 +46,7 @@ export default async function Page({ params }: PageProps) {
 
   let published = posts.filter((p) => p.categoryId === category.id);
   const categoryById = new Map(categories.map((c) => [c.id, c.name]));
+  const categorySlugById = new Map(categories.map((c) => [c.id, c.slug || c.id]));
 
   return (
     <>
@@ -61,6 +62,7 @@ export default async function Page({ params }: PageProps) {
             posts={published as any} 
             fallbackImages={fallbackImages} 
             categoryMap={Object.fromEntries(categoryById)} 
+            categorySlugMap={Object.fromEntries(categorySlugById)}
           />
         </div>
       </section>

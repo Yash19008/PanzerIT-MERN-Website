@@ -91,10 +91,13 @@ export const readPostsPaginated = async (page: number = 1, limit: number = 10): 
 
 export const readActiveFrontendPosts = async (): Promise<Partial<BlogPost>[]> => {
   const [rows] = await pool.query(
-    `SELECT id, title, slug, status, featured, published_at, category_id, image, tags, meta_description, author, author_bio, created_at 
-     FROM blog_posts 
-     WHERE status = 'published' 
-     ORDER BY published_at DESC`
+    `SELECT bp.id, bp.title, bp.slug, bp.status, bp.featured, bp.published_at, bp.category_id, 
+            bp.image, bp.tags, bp.meta_description, bp.author, bp.author_bio, bp.created_at,
+            bc.name AS category_name, bc.slug AS category_slug
+     FROM blog_posts bp
+     LEFT JOIN blog_categories bc ON bp.category_id = bc.id
+     WHERE bp.status = 'published' 
+     ORDER BY bp.published_at DESC`
   )
   return (rows as any[]).map(row => sanitizeDeep({
     id: row.id,
@@ -105,6 +108,8 @@ export const readActiveFrontendPosts = async (): Promise<Partial<BlogPost>[]> =>
     publishedAt: row.published_at instanceof Date ? row.published_at.toISOString() : row.published_at ?? '',
     createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at ?? '',
     categoryId: row.category_id ?? '',
+    categoryName: row.category_name ?? '',
+    categorySlug: row.category_slug ?? (row.category_id ?? ''),
     image: row.image ?? '',
     tags: row.tags ? JSON.parse(row.tags) : [],
     metaDescription: row.meta_description ?? '',
@@ -430,8 +435,8 @@ export const findCategory = async (id: string): Promise<BlogCategory | undefined
 }
 
 export const findCategoryBySlug = async (slug: string): Promise<BlogCategory | undefined> => {
-  // Direct indexed query — avoids loading all categories into memory
-  const [rows] = await pool.query('SELECT * FROM blog_categories WHERE slug = ? LIMIT 1', [slug])
+  // Direct indexed query by slug or fallback to id
+  const [rows] = await pool.query('SELECT * FROM blog_categories WHERE slug = ? OR id = ? LIMIT 1', [slug, slug])
   const row = (rows as any[])[0]
   if (!row) return undefined
   return {

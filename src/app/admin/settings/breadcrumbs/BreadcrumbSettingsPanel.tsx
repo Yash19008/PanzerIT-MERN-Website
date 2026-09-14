@@ -144,7 +144,7 @@ export default function BreadcrumbSettingsPanel() {
 
             <div className={styles.sectionTitle}>
               <IconifyIcon icon="tabler:photo" />
-              <h4>Background Image</h4>
+              <h4>Background Image <small style={{ color: '#64748b', fontWeight: 'normal', fontSize: '13px' }}>(Recommended: 1920 × 620 px)</small></h4>
             </div>
 
             <div className={styles.upload}>
@@ -163,7 +163,7 @@ export default function BreadcrumbSettingsPanel() {
                 >
                   <IconifyIcon icon="tabler:photo" />
                   <strong>No image selected</strong>
-                  <small>Pick an image from the media library below</small>
+                  <small>Pick an image (1920 × 620 px) from the media library below</small>
                 </div>
               )}
 

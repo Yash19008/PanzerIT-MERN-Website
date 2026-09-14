@@ -51,6 +51,7 @@ const BrandFormPage = ({ mode, brandId }: Props) => {
   const [notFound, setNotFound] = useState(false)
   const [showImagePicker, setShowImagePicker] = useState(false)
   const [showLogoPicker, setShowLogoPicker] = useState(false)
+  const [showMenuIconPicker, setShowMenuIconPicker] = useState(false)
   const [showBreadcrumbImagePicker, setShowBreadcrumbImagePicker] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
@@ -303,6 +304,7 @@ const BrandFormPage = ({ mode, brandId }: Props) => {
       description,
       imageAlt: form.image ? (form.imageAlt?.trim() || name) : '',
       logoAlt: form.logo ? (form.logoAlt?.trim() || `${name} logo`) : '',
+      menuIcon: form.menuIcon?.trim() || '',
       order: Number(form.order) || 1,
       metaTitle: form.metaTitle?.trim() || name,
       metaDescription: form.metaDescription?.trim() || stripHtml(description).slice(0, 160),
@@ -562,6 +564,32 @@ const BrandFormPage = ({ mode, brandId }: Props) => {
               </label>
             )}
 
+            <div className={styles.field}>
+              <span>Header Dropdown Menu Icon / Logo</span>
+              <div className={styles.imageUpload}>
+                {form.menuIcon ? (
+                  <div className={styles.logoPreview} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <img src={form.menuIcon} alt="Menu Icon" style={{ width: '40px', height: '40px', objectFit: 'contain', background: '#f8fafc', padding: '4px', borderRadius: '6px', border: '1px solid #e2e8f0' }} />
+                    <button type="button" className={styles.removeImageBtn} onClick={() => set('menuIcon', '')} aria-label="Remove menu icon">
+                      <IconifyIcon icon="tabler:x" />
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" className={styles.logoUploadPlaceholder} onClick={() => setShowMenuIconPicker(true)}>
+                    <IconifyIcon icon="tabler:photo-plus" />
+                    <strong>Upload or select dropdown menu icon/logo</strong>
+                    <small>PNG, SVG, JPG, or WEBP</small>
+                  </button>
+                )}
+                {form.menuIcon && (
+                  <button type="button" className={styles.changeImageBtn} onClick={() => setShowMenuIconPicker(true)}>
+                    <IconifyIcon icon="tabler:upload" />
+                    Change Menu Icon
+                  </button>
+                )}
+              </div>
+            </div>
+
             <div className={styles.seoBox} style={{ marginTop: '20px' }}>
               <div className={styles.sectionTitle}>
                 <IconifyIcon icon="tabler:home" />
@@ -613,7 +641,7 @@ const BrandFormPage = ({ mode, brandId }: Props) => {
               </div>
 
               <div className={styles.field}>
-                <span>Breadcrumb Banner Image</span>
+                <span>Breadcrumb Banner Image <small style={{ color: '#64748b', fontWeight: 'normal', fontSize: '12px' }}>(Recommended: 1920 × 620 px)</small></span>
                 <div className={styles.imageUpload}>
                   {form.breadcrumbImage ? (
                     <div className={styles.imagePreview}>
@@ -626,7 +654,7 @@ const BrandFormPage = ({ mode, brandId }: Props) => {
                     <button type="button" className={styles.uploadPlaceholder} onClick={() => setShowBreadcrumbImagePicker(true)}>
                       <IconifyIcon icon="tabler:photo-plus" />
                       <strong>Upload or select breadcrumb image</strong>
-                      <small>PNG, JPG, WEBP, or GIF</small>
+                      <small>PNG, JPG, WEBP, or GIF (1920 × 620 px)</small>
                     </button>
                   )}
                   {form.breadcrumbImage && (
@@ -845,6 +873,14 @@ const BrandFormPage = ({ mode, brandId }: Props) => {
           show={showLogoPicker}
           onClose={() => setShowLogoPicker(false)}
           onSelect={(url) => set('logo', url)}
+        />
+      )}
+
+      {showMenuIconPicker && (
+        <MediaPickerModal
+          show={showMenuIconPicker}
+          onClose={() => setShowMenuIconPicker(false)}
+          onSelect={(url) => set('menuIcon', url)}
         />
       )}
 
