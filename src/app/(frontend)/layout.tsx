@@ -19,7 +19,10 @@ import "./globals.css";
 
 import { SiteFooter } from "@/components/frontend/SiteFooter";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://panzerit.com';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Panzer IT | Make 'IT' Secure",
   description: "Panzer IT — Professional IT Services",
   icons: {
@@ -38,11 +41,16 @@ export default async function FrontendLayout({
   children: React.ReactNode;
 }>) {
   // Optimized: Single cached query instead of loading full datasets
-  const headerData = await getHeaderData();
+  const [headerData, themeColorsSetting, customCode, dynamicFavicon] = await Promise.all([
+    getHeaderData(),
+    readSetting<Record<string, string>>('frontend_theme_colors', {}),
+    getCustomCode(),
+    readSetting<string>('frontend_favicon', ''),
+  ]);
 
-  let themeColors = await readSetting<Record<string, string>>('frontend_theme_colors', {});
-  const customCode = await getCustomCode();
-  
+  let themeColors = themeColorsSetting;
+  const faviconUrl = dynamicFavicon || '/assets/images/favicons/favicon.jpeg';
+
   // Theme Preview Override via Cookies
   const cookieStore = await cookies();
   const previewCookie = cookieStore.get('theme_preview_colors')?.value;
@@ -63,7 +71,8 @@ export default async function FrontendLayout({
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         :root, html:root, body {
           --theme-color: #1053f3;
           --theme-navy-dark: #061153;
@@ -91,6 +100,11 @@ export default async function FrontendLayout({
           ${cssVariables || ''}
         }
       `}} />
+      {/* Dynamic Favicon */}
+      <link rel="icon" href={faviconUrl} sizes="any" />
+      <link rel="shortcut icon" href={faviconUrl} />
+      <link rel="apple-touch-icon" href={faviconUrl} />
+
       {/* Resource Hints - Improve connection speed */}
       <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
       <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
@@ -110,23 +124,23 @@ export default async function FrontendLayout({
           <style dangerouslySetInnerHTML={{ __html: customCode.headCSS }} />
         )
       )}
-      
+
       {/* Fonts - Async loading */}
       <link
         href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400&family=Manrope:wght@200..800&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet"
       />
-      
+
       {/* CRITICAL CSS */}
       <link rel="stylesheet" href="/assets/css/style.css" />
       {/* Swiper CSS - Keep blocking (critical for slider) */}
       <link rel="stylesheet" href="/assets/css/swiper-bundle.min.css?v=20260524" />
-      
+
       {/* Font Awesome - Keep blocking (icons used everywhere) */}
       <link rel="stylesheet" href="/assets/fontawesome/css/fontawesome.min.css?v=20260524" />
-      
+
       {/* ✅ OPTIMIZED: Bootstrap loaded via Next.js bundler (imported above) */}
-      
+
       {/* NON-BLOCKING CSS - Loaded asynchronously after initial render */}
       <NonBlockingCSS />
 
@@ -140,7 +154,7 @@ export default async function FrontendLayout({
       <RouteScripts />
       <ScrollToTop />
       <HomeServicePins />
-      
+
       {isPreviewMode && <ThemePreviewBanner />}
 
       {/* ── Admin: Custom Footer Scripts ── */}

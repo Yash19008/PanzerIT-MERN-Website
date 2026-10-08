@@ -20,6 +20,7 @@ export type BrandPartner = {
   imageAlt?: string
   logo: string
   logoAlt?: string
+  menuIcon?: string
   order: number
   featured: boolean
   status: BrandStatus

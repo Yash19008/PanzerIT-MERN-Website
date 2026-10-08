@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next'
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate every hour (auto-updates time to time)
 import { readPosts } from '@/app/admin/posts/blogStore'
 import { readBrands } from '@/app/admin/brands/brandStore'
 import { readSolutions } from '@/app/admin/solutions/solutionStore'
@@ -10,8 +10,10 @@ const toValidDate = (dateString?: string) => {
   return isNaN(d.getTime()) ? new Date() : d;
 };
 
+import { getSiteUrl } from '@/utils/metadata';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.panzerit.com';
+  const siteUrl = getSiteUrl();
 
   const [posts, brands, solutions] = await Promise.all([
     readPosts(),

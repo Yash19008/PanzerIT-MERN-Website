@@ -78620,6 +78620,8 @@ a.text-theme:hover,
     width: 0 !important;
 }
 
+
+
 @media (min-width: 992px) {
 
     .main-menu ul.sub-menu.brand-sub-menu,
@@ -90602,7 +90604,7 @@ body {
 }
 
 .panzer-page-solution-details .panzer-solution-detail-section {
-    padding: clamp(56px, 7vw, 94px) 0;
+    padding: clamp(56px, 7vw, 55px) 0;
     overflow: visible !important;
 }
 

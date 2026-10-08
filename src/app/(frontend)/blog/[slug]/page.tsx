@@ -7,7 +7,9 @@ import { findPostBySlug, readActiveFrontendPosts, readCategories } from "@/app/a
 import { sanitizeHtml } from "@/utils/sanitize";
 import { generateToc } from "@/utils/toc";
 import { TableOfContents } from "@/components/frontend/TableOfContents";
-import { formatPageTitle } from "@/utils/metadata";
+import { formatPageTitle, getSiteUrl } from "@/utils/metadata";
+import { ScrollableTagsBox } from "@/components/frontend/ScrollableTagsBox";
+
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -25,14 +27,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  const title = formatPageTitle(post.metaTitle || post.title);
+  const description = post.metaDescription || (post.description || '').substring(0, 160).replace(/<[^>]*>?/gm, '');
+  const image = post.image;
+
   return {
-    title: formatPageTitle(post.metaTitle || post.title),
-    description: post.metaDescription || (post.description || '').substring(0, 160).replace(/<[^>]*>?/gm, ''), // Fallback description stripping HTML tags
+    title,
+    description,
     keywords: post.metaKeywords,
     openGraph: {
-      title: formatPageTitle(post.metaTitle || post.title),
-      description: post.metaDescription || (post.description || '').substring(0, 160).replace(/<[^>]*>?/gm, ''),
-      images: post.image ? [{ url: post.image }] : undefined,
+      title,
+      description,
+      images: image ? [{ url: image }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: image ? [image] : undefined,
     },
     alternates: {
       canonical: `/blog/${post.slug}`,
@@ -80,7 +92,7 @@ export default async function Page({ params }: PageProps) {
 
   const { html: contentHtml, toc } = generateToc(sanitizeHtml(post.description || ""));
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.panzerit.com';
+  const siteUrl = getSiteUrl();
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -171,8 +183,11 @@ export default async function Page({ params }: PageProps) {
                     <div className="blog-details__bottom mt-40">
                       <div className="blog-details__tags">
                         <span>Posted In :</span>
-                        <ul className="blog-details__tags">
+                        <ul className="blog-details__tags blog-tags-scrollbar" style={{ maxHeight: '80px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                           {categoryName ? <li><Link href={`/blog/category/${postCategorySlug}`}>{categoryName}</Link></li> : null}
+                          {(post.tags || []).map((t, idx) => (
+                            <li key={idx}><Link href={`/blog/tag/${encodeURIComponent(t)}`}>{t}</Link></li>
+                          ))}
                         </ul>
                       </div>
                       <div className="blog-details__social-list">
@@ -292,13 +307,13 @@ export default async function Page({ params }: PageProps) {
                 {allTags.length > 0 && (
                   <div className="sidebar-widget mt-30">
                     <h4 className="sidebar-title"> Tags </h4>
-                    <div className="widget-box">
+                    <ScrollableTagsBox className="widget-box blog-tags-scrollbar" maxHeight={275}>
                       <ul className="blog-details__tags" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                         {allTags.map((tag, idx) => (
                           <li key={idx}><Link href={`/blog/tag/${encodeURIComponent(tag)}`}>{tag}</Link></li>
                         ))}
                       </ul>
-                    </div>
+                    </ScrollableTagsBox>
                   </div>
                 )}
               </div>

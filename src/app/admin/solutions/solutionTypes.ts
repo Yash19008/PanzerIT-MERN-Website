@@ -44,6 +44,7 @@ export type SolutionService = {
   imageAlt?: string
   logo: string
   logoAlt?: string
+  menuIcon?: string
   slug: string
   order: number
   status: SolutionStatus

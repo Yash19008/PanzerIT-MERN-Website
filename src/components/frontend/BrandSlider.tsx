@@ -86,7 +86,7 @@ export function BrandSlider() {
       // Initialize Swiper with loop always enabled
       swiperInstance = new window.Swiper(brandSliderElement, {
         slidesPerView: 2,
-        slidesPerGroup: 2,
+        slidesPerGroup: 1,
         spaceBetween: 18,
         centeredSlides: false,
         loop: true, // Always enable loop
@@ -108,10 +108,10 @@ export function BrandSlider() {
         },
         breakpoints: {
           0: { slidesPerView: 1, slidesPerGroup: 1 },
-          576: { slidesPerView: 2, slidesPerGroup: 2 },
-          767: { slidesPerView: 3, slidesPerGroup: 2 },
-          854: { slidesPerView: 5, slidesPerGroup: 2 },
-          1199: { slidesPerView: 5, slidesPerGroup: 2 },
+          576: { slidesPerView: 2, slidesPerGroup: 1 },
+          767: { slidesPerView: 3, slidesPerGroup: 1 },
+          854: { slidesPerView: 5, slidesPerGroup: 1 },
+          1199: { slidesPerView: 5, slidesPerGroup: 1 },
         },
         on: {
           init: function () {

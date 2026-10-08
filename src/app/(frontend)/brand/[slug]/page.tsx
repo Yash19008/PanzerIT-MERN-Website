@@ -9,7 +9,7 @@ import { sanitizeHtml } from "@/utils/sanitize";
 import { generateToc, generateSlug } from "@/utils/toc";
 import { TableOfContents } from "@/components/frontend/TableOfContents";
 import { Metadata } from "next";
-import { formatPageTitle } from "@/utils/metadata";
+import { formatPageTitle, getSiteUrl } from "@/utils/metadata";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -115,7 +115,7 @@ export default async function Page({ params }: PageProps) {
     }))
   } : null;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.panzerit.com';
+  const siteUrl = getSiteUrl();
 
   const brandSchema = {
     "@context": "https://schema.org",

@@ -20,7 +20,7 @@ export const transporter = nodemailer.createTransport({
   port: parseInt(process.env.MAIL_PORT || '587', 10),
   secure: process.env.MAIL_PORT === '465', // true for 465, false for other ports like 587
   auth: {
-    user: process.env.MAIL_USERNAME || 'hello@codespine.in',
+    user: process.env.MAIL_USERNAME || 'hello@panzerit.com',
     pass: process.env.MAIL_PASSWORD || '', // User must fill this in .env
   },
 })
@@ -46,7 +46,7 @@ export const sendQuestionnaireEmail = async ({
   filePath?: string
   fileName?: string
 }) => {
-  const fromAddress = process.env.MAIL_FROM_ADDRESS || 'hello@codespine.in'
+  const fromAddress = process.env.MAIL_FROM_ADDRESS || 'hello@panzerit.com'
   const fromName = process.env.MAIL_FROM_NAME || 'Panzer IT'
 
   // Escape all user-supplied values before inserting into HTML
@@ -98,7 +98,7 @@ export const sendPasswordResetEmail = async ({
   email: string
   resetLink: string
 }) => {
-  const fromAddress = process.env.MAIL_FROM_ADDRESS || 'hello@codespine.in'
+  const fromAddress = process.env.MAIL_FROM_ADDRESS || 'hello@panzerit.com'
   const fromName = process.env.MAIL_FROM_NAME || 'Panzer IT'
 
   // Escape the reset link as an href attribute value to prevent attribute injection

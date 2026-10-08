@@ -19,9 +19,10 @@ import type {
   ResourceCategoryFormData,
   ResourceItem,
   ResourceFormData,
+  ResourceDirectorySettings,
 } from './resourceTypes'
 
-export type { ResourceCategory, ResourceCategoryFormData, ResourceItem, ResourceFormData }
+export type { ResourceCategory, ResourceCategoryFormData, ResourceItem, ResourceFormData, ResourceDirectorySettings }
 
 // ========================
 // RESOURCES
@@ -355,3 +356,27 @@ export const findResourceCategory = async (id: string): Promise<ResourceCategory
     createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
   }
 }
+
+// ========================
+// DIRECTORY / QUESTIONNAIRE LINK SETTINGS
+// ========================
+
+import { readSetting, writeSetting } from '../settings/settingsStore'
+import { DEFAULT_DIRECTORY_SETTINGS } from './resourceTypes'
+
+export const getResourceDirectorySettings = async (): Promise<ResourceDirectorySettings> => {
+  return await readSetting<ResourceDirectorySettings>('resource_directory_settings', DEFAULT_DIRECTORY_SETTINGS)
+}
+
+export const updateResourceDirectorySettings = async (
+  data: ResourceDirectorySettings
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    await checkAuth()
+    await writeSetting('resource_directory_settings', data)
+    return { success: true }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
+}
+

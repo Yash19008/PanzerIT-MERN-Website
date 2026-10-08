@@ -138,10 +138,26 @@ export default async function Page() {
         { id: 'marquee-5', text: 'VAPT & COMPLIANCE' },
     ];
 
-    const heroVideoUrl = homepageSettings?.heroVideoUrl || '/assets/images/hero/banner.mp4';
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://panzerit.com').replace(/\/+$/, '');
+
+    const websiteSchema = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Panzer IT",
+        "url": `${siteUrl}/`,
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": `${siteUrl}/search?q={search_term_string}`,
+            "query-input": "required name=search_term_string"
+        }
+    };
 
     return (
         <div className="panzer-page-home">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+            />
             <style>{`
                 @media (max-width: 991px) {
                     .panzer-page-home .panzer-cyber-shell {
@@ -311,7 +327,7 @@ export default async function Page() {
                                         </h2>
                                     </div>
                                     <div className="service-btn-wrapper">
-                                        <Link href="/solution" className="theme-btn br-30 service-view-all-btn panzer-static-service-btn">
+                                        <Link href="/solution" className="theme-btn br-30 service-view-all-btn">
                                             <span className="link-effect">
                                                 <span className="effect-1">View All</span>
                                                 <span className="effect-1">View All</span>
@@ -723,7 +739,8 @@ export default async function Page() {
                         ) : (
                             publishedPosts.map((post, index) => {
                                 const imgSrc = post.image || blogFallbackImages[index % blogFallbackImages.length];
-                                const categoryName = post.categoryId ? (homeCategoryById.get(post.categoryId) || "") : "";
+                                const categoryName = post.categoryName || (post.categoryId ? (homeCategoryById.get(post.categoryId) ?? "") : "");
+                                const categorySlug = post.categorySlug || (post.categoryId ? String(post.categoryId) : "");
                                 const dateStr = formatBlogDate(post.publishedAt || post.createdAt);
                                 return (
                                     <div key={post.id} className="col-lg-4 col-md-6 col-sm-6">
@@ -738,7 +755,16 @@ export default async function Page() {
                                                         height={284}
                                                         style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
                                                     />
-                                                    <div className="category-tag"><span></span>{categoryName || dateStr}</div>
+                                                    <div className="category-tag">
+                                                        <span></span>
+                                                        {categoryName ? (
+                                                            <Link href={`/blog/category/${categorySlug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                                                                {categoryName}
+                                                            </Link>
+                                                        ) : (
+                                                            dateStr
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 <div className="blog-content d-flex flex-column flex-grow-1">
                                                     <h4 className="title"><Link href={`/blog/${post.slug}`}>{post.title}</Link></h4>

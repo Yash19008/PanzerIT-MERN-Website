@@ -27,6 +27,8 @@ type HomepagePost = {
   publishedAt?: string
   createdAt?: string
   categoryId?: number
+  categoryName?: string
+  categorySlug?: string
   featured?: boolean
 }
 
@@ -62,12 +64,15 @@ async function fetchHomepageData(): Promise<HomepageData> {
     LIMIT 9
   `)
 
-  // Only fetch featured published posts (limit 3) for homepage
+  // Only fetch featured published posts (limit 3) with category info for homepage
   const [postsRows] = await pool.query(`
-    SELECT id, title, slug, image, image_alt, published_at, created_at, featured
-    FROM blog_posts 
-    WHERE status = 'published' AND featured = 1
-    ORDER BY published_at DESC
+    SELECT 
+      bp.id, bp.title, bp.slug, bp.image, bp.image_alt, bp.published_at, bp.created_at, bp.featured,
+      bp.category_id, bc.name AS category_name, bc.slug AS category_slug
+    FROM blog_posts bp
+    LEFT JOIN blog_categories bc ON bp.category_id = bc.id
+    WHERE bp.status = 'published' AND bp.featured = 1
+    ORDER BY bp.published_at DESC
     LIMIT 3
   `)
 
@@ -124,6 +129,9 @@ async function fetchHomepageData(): Promise<HomepageData> {
       featuredImage: sanitizeImage(p.image),
       publishedAt: p.published_at instanceof Date ? p.published_at.toISOString() : p.published_at,
       createdAt: p.created_at instanceof Date ? p.created_at.toISOString() : p.created_at,
+      categoryId: p.category_id,
+      categoryName: p.category_name || '',
+      categorySlug: p.category_slug || (p.category_id ? String(p.category_id) : ''),
       featured: Boolean(p.featured),
     })),
     brands: (brandsRows as any[]).map(b => ({

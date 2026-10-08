@@ -403,3 +403,22 @@ i.fa-solid {
   border-radius: 4px;
   margin-bottom: 1em;
 }
+
+/* Blog Details Tags Scrollbar (Hidden scrollbar while keeping mouse wheel & touch scrolling) */
+.blog-tags-scrollbar {
+  max-height: 275px;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.blog-tags-scrollbar::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Edge, Opera */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+
+

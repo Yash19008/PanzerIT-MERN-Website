@@ -40,6 +40,20 @@ export type {
 
 
 
+let solutionMenuIconEnsured = false
+async function ensureSolutionMenuIconColumn() {
+  if (solutionMenuIconEnsured) return
+  try {
+    const [cols] = await pool.query<any[]>("SHOW COLUMNS FROM solutions LIKE 'menu_icon'")
+    if (cols.length === 0) {
+      await pool.query("ALTER TABLE solutions ADD COLUMN menu_icon VARCHAR(500) NULL AFTER logo_alt")
+    }
+    solutionMenuIconEnsured = true
+  } catch (e) {
+    console.error('Error ensuring menu_icon column on solutions:', e)
+  }
+}
+
 // Legacy function for backward compatibility
 export const readSolutions = async (): Promise<SolutionService[]> => {
   const result = await readSolutionsPaginated(1, 1000)
@@ -48,6 +62,7 @@ export const readSolutions = async (): Promise<SolutionService[]> => {
 
 // New paginated function
 export const readSolutionsPaginated = async (page: number = 1, limit: number = 10): Promise<{ solutions: SolutionService[], total: number }> => {
+  await ensureSolutionMenuIconColumn()
   const offset = (page - 1) * limit
   
   // Get total count
@@ -87,6 +102,7 @@ export const readSolutionsPaginated = async (page: number = 1, limit: number = 1
     imageAlt: sol.image_alt || '',
     logo: sol.logo || '',
     logoAlt: sol.logo_alt || '',
+    menuIcon: sol.menu_icon || '',
     slug: sol.slug,
     order: sol.sort_order,
     status: sol.status,
@@ -140,6 +156,7 @@ export const readSolutionsPaginated = async (page: number = 1, limit: number = 1
   return { solutions: mappedSolutions.map(sanitizeDeep), total }
 }
 export const findSolutionBySlug = async (slug: string): Promise<SolutionService | undefined> => {
+  await ensureSolutionMenuIconColumn()
   const [solutionsRow] = await pool.query('SELECT * FROM solutions WHERE slug = ? LIMIT 1', [slug])
   const solutions = solutionsRow as any[]
   
@@ -171,6 +188,7 @@ export const findSolutionBySlug = async (slug: string): Promise<SolutionService 
     imageAlt: sol.image_alt || '',
     logo: sol.logo || '',
     logoAlt: sol.logo_alt || '',
+    menuIcon: sol.menu_icon || '',
     slug: sol.slug,
     order: sol.sort_order,
     status: sol.status,
@@ -244,6 +262,7 @@ export const readRandomSolutions = async (excludeSlug: string, limit: number = 1
 
 export const createSolution = async (data: SolutionFormData): Promise<SolutionService | { success: false, message: string }> => {
   await checkAuth()
+  await ensureSolutionMenuIconColumn()
   const connection = await pool.getConnection()
   try {
     await connection.beginTransaction()
@@ -259,8 +278,8 @@ export const createSolution = async (data: SolutionFormData): Promise<SolutionSe
     }
 
     await connection.query(
-      `INSERT INTO solutions (id, title, subtitle, description, category, image, image_title, image_caption, image_description, image_alt, logo, logo_alt, slug, sort_order, status, meta_title, meta_description, meta_keywords, is_featured, breadcrumb_description, breadcrumb_image, breadcrumb_image_alt, breadcrumb_image_title, breadcrumb_image_caption, breadcrumb_image_description, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO solutions (id, title, subtitle, description, category, image, image_title, image_caption, image_description, image_alt, logo, logo_alt, menu_icon, slug, sort_order, status, meta_title, meta_description, meta_keywords, is_featured, breadcrumb_description, breadcrumb_image, breadcrumb_image_alt, breadcrumb_image_title, breadcrumb_image_caption, breadcrumb_image_description, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         data.title || '',
@@ -274,6 +293,7 @@ export const createSolution = async (data: SolutionFormData): Promise<SolutionSe
         data.imageAlt || '',
         data.logo ? stripBase64(data.logo) : '',
         data.logoAlt || '',
+        data.menuIcon ? stripBase64(data.menuIcon) : '',
         slug,
         data.order || 0,
         data.status || 'active',
@@ -345,6 +365,7 @@ export const createSolution = async (data: SolutionFormData): Promise<SolutionSe
 
 export const updateSolution = async (id: string, data: SolutionFormData): Promise<SolutionService | undefined | { success: false, message: string }> => {
   await checkAuth()
+  await ensureSolutionMenuIconColumn()
   const connection = await pool.getConnection()
   try {
     await connection.beginTransaction()
@@ -358,7 +379,7 @@ export const updateSolution = async (id: string, data: SolutionFormData): Promis
     }
 
     await connection.query(
-      `UPDATE solutions SET title = ?, subtitle = ?, description = ?, category = ?, image = ?, image_title = ?, image_caption = ?, image_description = ?, image_alt = ?, logo = ?, logo_alt = ?, slug = ?, sort_order = ?, status = ?, meta_title = ?, meta_description = ?, meta_keywords = ?, is_featured = ?, breadcrumb_description = ?, breadcrumb_image = ?, breadcrumb_image_alt = ?, breadcrumb_image_title = ?, breadcrumb_image_caption = ?, breadcrumb_image_description = ? WHERE id = ?`,
+      `UPDATE solutions SET title = ?, subtitle = ?, description = ?, category = ?, image = ?, image_title = ?, image_caption = ?, image_description = ?, image_alt = ?, logo = ?, logo_alt = ?, menu_icon = ?, slug = ?, sort_order = ?, status = ?, meta_title = ?, meta_description = ?, meta_keywords = ?, is_featured = ?, breadcrumb_description = ?, breadcrumb_image = ?, breadcrumb_image_alt = ?, breadcrumb_image_title = ?, breadcrumb_image_caption = ?, breadcrumb_image_description = ? WHERE id = ?`,
       [
         data.title || '',
         data.subtitle || '',
@@ -371,6 +392,7 @@ export const updateSolution = async (id: string, data: SolutionFormData): Promis
         data.imageAlt || '',
         data.logo ? stripBase64(data.logo) : '',
         data.logoAlt || '',
+        data.menuIcon ? stripBase64(data.menuIcon) : '',
         slug,
         data.order || 0,
         data.status || 'active',
@@ -446,6 +468,7 @@ export const deleteSolution = async (id: string): Promise<void> => {
 }
 
 export const findSolution = async (id: string): Promise<SolutionService | undefined> => {
+  await ensureSolutionMenuIconColumn()
   const [solutionsRow] = await pool.query('SELECT * FROM solutions WHERE id = ? LIMIT 1', [id])
   const sol = (solutionsRow as any[])[0]
   if (!sol) return undefined
@@ -494,7 +517,7 @@ export const findSolution = async (id: string): Promise<SolutionService | undefi
     }
   })
 
-  return {
+  return sanitizeDeep({
     id: sol.id,
     title: sol.title,
     subtitle: sol.subtitle || '',
@@ -507,6 +530,7 @@ export const findSolution = async (id: string): Promise<SolutionService | undefi
     imageAlt: sol.image_alt || '',
     logo: sol.logo || '',
     logoAlt: sol.logo_alt || '',
+    menuIcon: sol.menu_icon || '',
     slug: sol.slug,
     order: sol.sort_order,
     status: sol.status,
@@ -515,10 +539,16 @@ export const findSolution = async (id: string): Promise<SolutionService | undefi
     metaDescription: sol.meta_description || '',
     metaKeywords: sol.meta_keywords || '',
     isFeatured: !!sol.is_featured,
+    breadcrumbDescription: sol.breadcrumb_description || '',
+    breadcrumbImage: sol.breadcrumb_image || '',
+    breadcrumbImageAlt: sol.breadcrumb_image_alt || '',
+    breadcrumbImageTitle: sol.breadcrumb_image_title || '',
+    breadcrumbImageCaption: sol.breadcrumb_image_caption || '',
+    breadcrumbImageDescription: sol.breadcrumb_image_description || '',
     featureCards,
     implementationSteps,
     extraCards,
-  }
+  }) as SolutionService
 }
 
 

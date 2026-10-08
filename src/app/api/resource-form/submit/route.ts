@@ -57,10 +57,10 @@ export async function POST(request: NextRequest) {
 
       const uniqueName = `submission_${Date.now()}.${ext}`
       const uploadDir = join(process.cwd(), 'public', 'uploads', 'submissions')
-      
+
       await mkdir(uploadDir, { recursive: true })
       await writeFile(join(uploadDir, uniqueName), buffer)
-      
+
       uploadedFileUrl = `/uploads/submissions/${uniqueName}`
       uploadedFilename = file.name
     }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     // Fetch the admin email configured in the footer
     const footerSettings = await readFooterSettings()
-    const adminEmail = footerSettings.email || 'hello@codespine.in'
+    const adminEmail = footerSettings.email || 'info@panzerit.com'
 
     // Send the email with the attachment
     try {

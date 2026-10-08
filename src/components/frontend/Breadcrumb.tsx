@@ -59,78 +59,110 @@ export function Breadcrumb({
     </nav>
   );
 
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://panzerit.com').replace(/\/+$/, '');
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": `${siteUrl}/`
+      },
+      ...paths.map((p, index) => {
+        const itemObj: { "@type": string; position: number; name: string; item?: string } = {
+          "@type": "ListItem",
+          "position": index + 2,
+          "name": p.name
+        };
+        if (p.url) {
+          itemObj.item = p.url.startsWith('http') ? p.url : `${siteUrl}${p.url.startsWith('/') ? '' : '/'}${p.url}`;
+        }
+        return itemObj;
+      })
+    ]
+  };
+
   return (
-    <section className="panzer-resource-breadcrumb-section" aria-label={`${title} breadcrumb`}>
-      <div className="container-fluid">
-        <div className="container">
-          {navContent}
-        </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <section className="panzer-resource-breadcrumb-section" aria-label={`${title} breadcrumb`}>
+        <div className="container-fluid">
+          <div className="container">
+            {navContent}
+          </div>
 
-        {!hideBanner && (
-          <div
-            className="container-fluid panzer-resource-breadcrumb-shell"
-            style={{
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            {hasImage && (
-              <Image
-                src={image!}
-                alt={imageAlt || `${title} banner background`}
-                title={imageTitle || imageCaption || imageAlt}
-                fill
-                priority
-                sizes="100vw"
-                style={{
-                  objectFit: "cover",
-                  objectPosition: "center",
-                  zIndex: 0,
-                }}
-              />
-            )}
-
+          {!hideBanner && (
             <div
-              className="container panzer-breadcrumb-center"
-              style={{ position: "relative", zIndex: 2 }}
+              className="container-fluid panzer-resource-breadcrumb-shell"
+              style={{
+                position: "relative",
+                overflow: "hidden",
+              }}
             >
+              {hasImage && (
+                <Image
+                  src={image!}
+                  alt={imageAlt || `${title} banner background`}
+                  title={imageTitle || imageCaption || imageAlt}
+                  fill
+                  priority
+                  sizes="100vw"
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: "center",
+                    zIndex: 0,
+                  }}
+                />
+              )}
+
               <div
-                className="panzer-resource-breadcrumb-copy text-center"
-                style={{
-                  maxWidth: "900px",
-                  margin: "0 auto",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
+                className="container panzer-breadcrumb-center"
+                style={{ position: "relative", zIndex: 2 }}
               >
-                <h1
-                  className="panzer-resource-breadcrumb-title"
-                  style={{ margin: 0, textAlign: "center" }}
+                <div
+                  className="panzer-resource-breadcrumb-copy text-center"
+                  style={{
+                    maxWidth: "900px",
+                    margin: "0 auto",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
                 >
-                  {title}
-                </h1>
-                {description && description.trim() !== "" ? (
-                  /<[a-z][\s\S]*>/i.test(description) ? (
-                    <div
-                      className="panzer-resource-breadcrumb-text"
-                      style={{ marginTop: "12px", textAlign: "center" }}
-                      dangerouslySetInnerHTML={{ __html: description }}
-                    />
-                  ) : (
-                    <p
-                      className="panzer-resource-breadcrumb-text"
-                      style={{ marginTop: "12px", textAlign: "center" }}
-                    >
-                      {description}
-                    </p>
-                  )
-                ) : null}
+                  <h1
+                    className="panzer-resource-breadcrumb-title"
+                    style={{ margin: 0, textAlign: "center" }}
+                  >
+                    {title}
+                  </h1>
+                  {description && description.trim() !== "" ? (
+                    /<[a-z][\s\S]*>/i.test(description) ? (
+                      <div
+                        className="panzer-resource-breadcrumb-text"
+                        style={{ marginTop: "12px", textAlign: "center" }}
+                        dangerouslySetInnerHTML={{ __html: description }}
+                      />
+                    ) : (
+                      <p
+                        className="panzer-resource-breadcrumb-text"
+                        style={{ marginTop: "12px", textAlign: "center" }}
+                      >
+                        {description}
+                      </p>
+                    )
+                  ) : null}
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    </section>
+          )}
+        </div>
+      </section>
+    </>
   );
 }

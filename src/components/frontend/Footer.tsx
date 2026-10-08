@@ -200,6 +200,8 @@ export function Footer({ columns, contact = {} }: Props) {
       <div className={styles.bottomBar}>
         <p className={styles.copyright} suppressHydrationWarning>
           Copyright &copy; {new Date().getFullYear()} Panzer IT &mdash; Make IT Secure. All Rights Reserved.
+          <br />
+          Designed &amp; Developed by <a href="https://crescitasoftware.com/" target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'underline'}}>Crescita Software</a>
         </p>
 
         <div className={styles.bottomRight}>

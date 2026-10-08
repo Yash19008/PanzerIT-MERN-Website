@@ -56,6 +56,34 @@ function ExpandToggle({
   );
 }
 
+function DropdownItemIcon({ item }: { item: any }) {
+  const iconSrc = item.menuIcon || item.icon || "fa-shield-check";
+  const isImage = typeof iconSrc === 'string' && (
+    iconSrc.startsWith('/') ||
+    iconSrc.startsWith('http') ||
+    iconSrc.startsWith('data:image/') ||
+    /\.(png|jpg|jpeg|svg|webp|gif|ico)$/i.test(iconSrc)
+  );
+
+  if (isImage) {
+    return (
+      <img
+        src={iconSrc}
+        alt=""
+        className="panzer-dropdown-icon panzer-dropdown-img"
+      />
+    );
+  }
+
+  // Ensure FontAwesome style prefix (e.g. 'fa-solid', 'fa-regular', 'fa-light', 'fas', 'fal', etc.) is present
+  const hasStylePrefix = /\b(fa-solid|fa-regular|fa-light|fa-thin|fa-duotone|fa-brands|fas|far|fal|fat|fad|fab)\b/.test(iconSrc);
+  const iconClass = hasStylePrefix
+    ? iconSrc
+    : `fa-solid ${iconSrc.startsWith('fa-') ? iconSrc : `fa-${iconSrc}`}`;
+
+  return <i className={`${iconClass} panzer-dropdown-icon`}></i>;
+}
+
 function MainNavigation({
   className = "navigation",
   mobile = false,
@@ -95,7 +123,7 @@ function MainNavigation({
           {activeSolutions.map((item: any) => (
             <li key={item.label}>
               <Link href={item.href || "/solution"} onClick={onNavigate}>
-                <i className={`fa-solid ${item.icon || "fa-shield-check"} panzer-dropdown-icon`}></i>
+                <DropdownItemIcon item={item} />
                 <span>{item.label}</span>
               </Link>
             </li>
@@ -114,7 +142,7 @@ function MainNavigation({
           {activeBrands.map((item: any) => (
             <li key={item.id || item.label}>
               <Link href={item.href || "/brand"} onClick={onNavigate}>
-                <i className="fa-solid fa-shield-check panzer-dropdown-icon"></i>
+                <DropdownItemIcon item={item} />
                 <span>{item.label}</span>
               </Link>
             </li>
@@ -279,17 +307,17 @@ export function SiteHeader({ headerData }: { headerData?: any }) {
                 <div className="col-auto header-right-wrapper">
                   <div className="outer-box d-flex align-items-center gap-3">
                     <div style={{ position: 'relative' }}>
-                      <button 
-                        className="search-btn" 
-                        type="button" 
+                      <button
+                        className="search-btn"
+                        type="button"
                         aria-label={isSearchExpanded ? "Close search" : "Search"}
                         onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-                        style={{ 
-                          background: 'none', 
-                          border: 'none', 
-                          color: 'inherit', 
-                          fontSize: '18px', 
-                          padding: '0 10px', 
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'inherit',
+                          fontSize: '18px',
+                          padding: '0 10px',
                           cursor: 'pointer',
                           width: '38px',
                           height: '38px',
@@ -301,10 +329,10 @@ export function SiteHeader({ headerData }: { headerData?: any }) {
                       >
                         <i className={`fa-solid ${isSearchExpanded ? 'fa-times' : 'fa-magnifying-glass'}`} style={{ pointerEvents: 'none' }}></i>
                       </button>
-                      
+
                       {/* Small Dropdown Search Box */}
                       {isSearchExpanded && (
-                        <div 
+                        <div
                           style={{
                             position: 'absolute',
                             top: 'calc(100% + 10px)',
@@ -331,8 +359,8 @@ export function SiteHeader({ headerData }: { headerData?: any }) {
                             }
                           `}</style>
                           <form method="get" action="/search">
-                            <div style={{ 
-                              display: 'flex', 
+                            <div style={{
+                              display: 'flex',
                               alignItems: 'center',
                               borderBottom: '3px solid var(--theme-color)',
                               position: 'relative'
@@ -359,15 +387,15 @@ export function SiteHeader({ headerData }: { headerData?: any }) {
                                   }
                                 }}
                               />
-                              <button 
-                                type="submit" 
-                                aria-label="Search" 
-                                style={{ 
+                              <button
+                                type="submit"
+                                aria-label="Search"
+                                style={{
                                   background: 'none',
-                                  border: 'none', 
-                                  color: 'var(--theme-color)', 
-                                  cursor: 'pointer', 
-                                  fontSize: '20px', 
+                                  border: 'none',
+                                  color: 'var(--theme-color)',
+                                  cursor: 'pointer',
+                                  fontSize: '20px',
                                   padding: '5px 10px',
                                   display: 'flex',
                                   alignItems: 'center'
@@ -530,16 +558,16 @@ export function SiteHeader({ headerData }: { headerData?: any }) {
                 <div className="col-auto header-right-wrapper">
                   <div className="outer-box d-flex align-items-center gap-3">
                     <div style={{ position: 'relative' }}>
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         aria-label={isStickySearchExpanded ? "Close search" : "Search"}
                         onClick={() => setIsStickySearchExpanded(!isStickySearchExpanded)}
-                        style={{ 
-                          background: 'none', 
-                          border: 'none', 
-                          color: 'inherit', 
-                          fontSize: '18px', 
-                          padding: '0 10px', 
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'inherit',
+                          fontSize: '18px',
+                          padding: '0 10px',
                           cursor: 'pointer',
                           width: '38px',
                           height: '38px',
@@ -551,10 +579,10 @@ export function SiteHeader({ headerData }: { headerData?: any }) {
                       >
                         <i className={`fa-solid ${isStickySearchExpanded ? 'fa-times' : 'fa-magnifying-glass'}`} style={{ pointerEvents: 'none' }}></i>
                       </button>
-                      
+
                       {/* Small Dropdown Search Box for Sticky Header */}
                       {isStickySearchExpanded && (
-                        <div 
+                        <div
                           style={{
                             position: 'absolute',
                             top: 'calc(100% + 10px)',
@@ -569,8 +597,8 @@ export function SiteHeader({ headerData }: { headerData?: any }) {
                           }}
                         >
                           <form method="get" action="/search">
-                            <div style={{ 
-                              display: 'flex', 
+                            <div style={{
+                              display: 'flex',
                               alignItems: 'center',
                               borderBottom: '3px solid var(--theme-color)',
                               paddingBottom: '10px',
@@ -598,15 +626,15 @@ export function SiteHeader({ headerData }: { headerData?: any }) {
                                   }
                                 }}
                               />
-                              <button 
-                                type="submit" 
-                                aria-label="Search" 
-                                style={{ 
+                              <button
+                                type="submit"
+                                aria-label="Search"
+                                style={{
                                   background: 'none',
-                                  border: 'none', 
-                                  color: 'var(--theme-color)', 
-                                  cursor: 'pointer', 
-                                  fontSize: '20px', 
+                                  border: 'none',
+                                  color: 'var(--theme-color)',
+                                  cursor: 'pointer',
+                                  fontSize: '20px',
                                   padding: '5px 10px',
                                   display: 'flex',
                                   alignItems: 'center'

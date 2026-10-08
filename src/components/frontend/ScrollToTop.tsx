@@ -8,7 +8,7 @@ export function ScrollToTop() {
 
   useEffect(() => {
     let ticking = false;
-    
+
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
@@ -16,30 +16,30 @@ export function ScrollToTop() {
           const windowHeight = window.innerHeight;
           const documentHeight = document.documentElement.scrollHeight;
           const scrollTop = window.scrollY || document.documentElement.scrollTop;
-          
+
           // Calculate percentage scrolled
           const totalScroll = documentHeight - windowHeight;
           const progress = totalScroll > 0 ? (scrollTop / totalScroll) * 100 : 0;
-          
+
           // Clamp progress between 0 and 100
           const clampedProgress = Math.min(Math.max(progress, 0), 100);
-          
+
           setScrollProgress(clampedProgress);
-          
+
           // Show button after scrolling down 100px
           const shouldShow = scrollTop > 100;
           setIsVisible(shouldShow);
-          
+
           ticking = false;
         });
-        
+
         ticking = true;
       }
     };
 
     // Add scroll event listener
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
+
     // Call once to set initial state
     handleScroll();
 
@@ -57,7 +57,7 @@ export function ScrollToTop() {
 
   const buttonStyle: React.CSSProperties = {
     position: 'fixed',
-    right: '12px',
+    right: '22px',
     bottom: '185px',
     width: '60px',
     height: '60px',
@@ -99,7 +99,7 @@ export function ScrollToTop() {
   const strokeDashoffset = circumference - (scrollProgress / 100) * circumference;
 
   return (
-    <div 
+    <div
       style={buttonStyle}
       onClick={scrollToTop}
       role="button"

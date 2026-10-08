@@ -5,6 +5,7 @@ import Link from "next/link";
 import ResourceQuestionnaireForm from "./ResourceQuestionnaireForm";
 
 import { sanitizeHtml } from "@/utils/sanitize";
+import type { ResourceDirectorySettings } from "@/app/admin/resources/resourceTypes";
 
 type ResourceItem = {
   id?: string;
@@ -81,11 +82,13 @@ function ResourceDescription({ text }: { text: string }) {
 export default function ResourcesFilterClient({
   items,
   categories = [],
-  questionnaires = []
+  questionnaires = [],
+  directorySettings
 }: {
   items: ResourceItem[],
   categories?: Category[],
-  questionnaires?: any[]
+  questionnaires?: any[],
+  directorySettings?: ResourceDirectorySettings
 }) {
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
@@ -300,32 +303,36 @@ export default function ResourcesFilterClient({
           </div>
 
 
-          <div className="panzer-solution-detail-side-card mt-4" style={{ padding: '20px' }}>
-            <h2 style={{ marginBottom: '15px', fontSize: '20px' }}>Directories</h2>
-            <p style={{ fontSize: '14px', marginBottom: '20px' }}>
-              Access and fill out our questionnaires by clicking the link below.
-            </p>
-            <a
-              href="https://codespine.in/test-panzer/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="category-btn"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
-                padding: '12px 15px',
-                borderRadius: '4px',
-                fontWeight: 600,
-                textDecoration: 'none',
-                textAlign: 'center',
-              }}
-            >
-              <i className="fa-solid fa-clipboard-list" style={{ marginRight: '8px' }}></i>
-              Open Questionnaire
-            </a>
-          </div>
+          {directorySettings?.enabled !== false && (
+            <div className="panzer-solution-detail-side-card mt-4" style={{ padding: '20px' }}>
+              <h2 style={{ marginBottom: '15px', fontSize: '20px' }}>
+                {directorySettings?.title || "Directories"}
+              </h2>
+              <p style={{ fontSize: '14px', marginBottom: '20px' }}>
+                {directorySettings?.description || "Access and fill out our questionnaires by clicking the link below."}
+              </p>
+              <a
+                href={directorySettings?.buttonLink || "https://panzerit.com/resources"}
+                target={directorySettings?.openInNewTab !== false ? "_blank" : "_self"}
+                rel="noopener noreferrer"
+                className="category-btn"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  padding: '12px 15px',
+                  borderRadius: '4px',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  textAlign: 'center',
+                }}
+              >
+                <i className="fa-solid fa-clipboard-list" style={{ marginRight: '8px' }}></i>
+                {directorySettings?.buttonText || "Open Questionnaire"}
+              </a>
+            </div>
+          )}
         </div>
       </aside>
       <div className="panzer-solution-detail-content">

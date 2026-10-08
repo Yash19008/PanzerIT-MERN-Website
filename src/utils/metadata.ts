@@ -14,10 +14,18 @@ export function formatPageTitle(title: string | undefined | null): string {
 }
 
 /**
- * Creates metadata object with formatted title and tagline
+ * Returns the site URL from environment variable without trailing slash.
+ */
+export function getSiteUrl(): string {
+  const url = process.env.NEXT_PUBLIC_SITE_URL || 'https://panzerit.com';
+  return url.replace(/\/+$/, '');
+}
+
+/**
+ * Creates metadata object with formatted title, OpenGraph, Twitter card, and canonical URL
  * @param seoData - SEO data from database
  * @param canonicalPath - Canonical URL path (e.g., '/about')
- * @returns Metadata object with formatted title
+ * @returns Metadata object
  */
 export function createPageMetadata(
   seoData: {
@@ -28,14 +36,24 @@ export function createPageMetadata(
   },
   canonicalPath: string
 ): Metadata {
+  const title = formatPageTitle(seoData.metaTitle);
+  const description = seoData.metaDescription;
+  const image = seoData.ogImage;
+
   return {
-    title: formatPageTitle(seoData.metaTitle),
-    description: seoData.metaDescription,
+    title,
+    description,
     keywords: seoData.metaKeywords,
     openGraph: {
-      title: formatPageTitle(seoData.metaTitle),
-      description: seoData.metaDescription,
-      images: seoData.ogImage ? [{ url: seoData.ogImage }] : undefined,
+      title,
+      description,
+      images: image ? [{ url: image }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: image ? [image] : undefined,
     },
     alternates: {
       canonical: canonicalPath,

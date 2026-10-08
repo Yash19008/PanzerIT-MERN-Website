@@ -50,3 +50,22 @@ export interface ResourceFormData {
   status?: ResourceStatus
   order?: number
 }
+
+export interface ResourceDirectorySettings {
+  title: string
+  description: string
+  buttonText: string
+  buttonLink: string
+  openInNewTab: boolean
+  enabled?: boolean
+}
+
+export const DEFAULT_DIRECTORY_SETTINGS: ResourceDirectorySettings = {
+  title: 'Directories',
+  description: 'Access and fill out our questionnaires by clicking the link below.',
+  buttonText: 'Open Questionnaire',
+  buttonLink: 'https://panzerit.com/resources',
+  openInNewTab: true,
+  enabled: true,
+}
+
